@@ -1,0 +1,53 @@
+//
+// user-variables.scss
+// Use this to override Bootstrap and Finder variables
+//
+
+// Example of a variable override to change Finder background color
+// Remove the "//" to comment it in and see it in action!
+// $body-bg: #12263F;
+
+// 폰트
+@font-face {
+  font-family: "HANAMDAUM";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-2@1.0/HANAMDAUM.woff2") format("woff2");
+  font-weight: 400, 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "PyeongChang-Bold";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2206-02@1.0/PyeongChang-Bold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: "PyeongChang-Regular";
+  src: url("../public/fonts/PyeongChang-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: "GmarketSansMedium";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff") format("woff");
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "GmarketSansLight";
+  src: url("../public/fonts/GmarketSansTTFLight.ttf") format("truetype");
+  font-style: normal;
+  font-weight: normal;
+}
+
+//글자색
+$header-gray: #656565 !default; //gray-700이랑 비슷함
+$footer-background: #2e2b2c !default;
+$dark-primary: #802339 !default;
+$beige: #e5ccaf !default;
+$dark-brown: #44311b !default;
+$dark-gray: #454545 !default;
+$light-yellow: #fffbec !default;
+$dark-yellow: #ba971a !default;

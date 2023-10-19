@@ -1,0 +1,16 @@
+node_modules
+
+# Ignore Next.js build output
+/.next/
+
+# Ignore server-side build files
+/server/.next/
+
+# Ignore .env files (optional, if you have sensitive configuration in .env)
+.env
+
+# Ignore log files (optional, if you don't want to include logs)
+*.log
+
+# Ignore backup files (optional, if you don't want to include backups)
+*.bak

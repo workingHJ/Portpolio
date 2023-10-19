@@ -1,0 +1,248 @@
+//
+// user.scss
+// Use this to write your custom SCSS
+//
+
+/* ------------------------ 폰트 ------------------------ */
+.hanamdaum {
+  font-family: "HANAMDAUM";
+  font-weight: normal !important;
+}
+
+.pyeongChang-bold {
+  font-family: "PyeongChang-Bold";
+}
+.pyeongChang-regular {
+  font-family: "PyeongChang-Regular";
+}
+
+.GmarketSansLight {
+  font-family: "GmarketSansLight";
+}
+
+.GmarketSansMedium {
+  font-family: "GmarketSansMedium";
+}
+
+/* ------------------------ 글자 디스플레이 ------------------------ */
+.fw-normal {
+  font-weight: normal !important;
+}
+
+.text-vertical {
+  writing-mode: vertical-lr;
+  transform-origin: top left;
+  white-space: nowrap;
+}
+
+/* ------------------------ 글자 컬러 ------------------------ */
+.text-black {
+  color: $black !important;
+}
+
+.text-hdGray {
+  color: $header-gray !important;
+}
+
+.text-beige {
+  color: $beige !important;
+}
+
+.text-dark-primary {
+  color: $dark-primary !important;
+}
+
+.text-dark-brown {
+  color: $dark-brown !important;
+}
+
+.text-gray500 {
+  color: $gray-500 !important;
+}
+.text-gray600 {
+  color: $gray-600 !important;
+}
+
+.text-darkYellow {
+  color: $dark-yellow !important;
+}
+
+/* ------------------------ 파츠 CSS ------------------------ */
+.cardDesc {
+  height: 48px !important;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  color: header-gray !important;
+}
+
+.memberCard {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  color: header-gray !important;
+}
+
+.gardenTitle {
+  top: 54% !important;
+  width: 40% !important;
+  padding-top: 30px !important;
+  left: 31% !important;
+}
+
+.gardenAuthorImg {
+  left: 338px !important;
+  top: -43px !important;
+  width: 80px !important;
+  height: 80px !important;
+}
+
+// 이만큼 키웠어요 하는 부분
+.statusText {
+  right: 0 !important;
+  top: 0 !important;
+  color: $dark-yellow;
+}
+
+.littleButton {
+  height: 30px !important;
+  font-family: PyeongChang-Regular !important;
+}
+
+// 줄 제한 두는 거
+.textBox {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.textBox-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+}
+
+.height2rem {
+  height: 2rem;
+}
+
+.text-indent1em {
+  text-indent: 1em;
+}
+
+/* -------------------------- 백그라운드 컬러 -------------------------------- */
+
+.bg-gNw {
+  background: linear-gradient(to top, $secondary 80%, #fff 20%);
+}
+
+.cardBack {
+  background-color: $gray-300;
+}
+
+.bg-lightYellow {
+  background: $light-yellow;
+}
+
+/* ------------------------ 줄간격 속성------------------------ */
+
+.lh-180 {
+  line-height: 180%;
+}
+
+.lh-160 {
+  line-height: 160%;
+}
+
+.headerImgUpload {
+  width: 900px !important;
+  height: 350px !important;
+}
+
+// 재열님 작업 필드
+.recommend {
+  margin-top: 10px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+}
+
+.text-shadow {
+  -webkit-text-stroke: 3px #454545;
+}
+
+.boxoffice-text-shadow {
+  -webkit-text-stroke: 1px #c5c6c6;
+  color: #fff;
+}
+
+.searchTypeRadio input[type="radio"] {
+  display: none;
+}
+
+.searchTypeRadio input[type="radio"] + span {
+  width: 90px;
+  height: 35px;
+  display: inline-block;
+  background-color: #f5f4f8;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.searchTypeRadio input[type="radio"]:checked + span {
+  background-color: #be3455;
+  color: #ffffff;
+}
+
+.text-iconGray {
+  color: #8f8f8f;
+}
+
+.wordBreak-keepAll {
+  word-break: keep-all;
+}
+// 박재열 끝
+
+/* ----------------------------------------------------- 문혜주 ------------------------------------------- */
+.end-6px {
+  right: -6px !important;
+}
+
+.cursor {
+  cursor: pointer !important;
+}
+
+.w-48 {
+  width: 48% !important;
+}
+
+.w-85 {
+  width: 85% !important;
+}
+
+.memberImg .filepond--drop-label {
+  border-radius: 50%;
+  transform: translate3d(0px, -33px, 0px) !important;
+  padding: 0px !important;
+}
+
+.memberImg {
+  overflow: hidden !important;
+  border-radius: 50% !important;
+  border: none !important;
+  object-fit: cover;
+}
+
+.filepond--drop-label label {
+  padding: 0px !important;
+}
