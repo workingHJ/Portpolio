@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.multi.semi03.aidkit_k.model.mapper.Aidkit_KMapper">
+	<resultMap type="Aidkit_K" id="aidkitResultMap">
+		<result property="aid_no" column="AID_NO"/>
+		<result property="bizplc_nm" column="BIZPLC_NM"/>
+		<result property="bsn_state_nm" column="BSN_STATE_NM"/>
+		<result property="refine_roadnm_addr" column="REFINE_ROADNM_ADDR"/>
+		<result property="sido" column="REFINE_ROADNM_ADDR"/>
+		<result property="gugun" column="REFINE_ROADNM_ADDR"/>
+		<result property="locplc_faclt_telno" column="LOCPLC_FACLT_TELNO"/>
+		<result property="x_crdnt_vl" column="X_CRDNT_VL"/>
+		<result property="y_crdnt_vl" column="Y_CRDNT_VL"/>
+		<result property="aid_img" column="AID_IMG"/>
+	</resultMap>
+	
+	<select id="selectAidkit_KList" parameterType="map" resultMap="aidkitResultMap">
+		SELECT 
+			AID_NO, BIZPLC_NM, BSN_STATE_NM, REFINE_ROADNM_ADDR, LOCPLC_FACLT_TELNO, X_CRDNT_VL, Y_CRDNT_VL, AID_IMG
+		FROM AIDKIT_K 
+		WHERE 1 = 1
+		<if test="bizplc_nm != null">
+		AND BIZPLC_NM LIKE '%${bizplc_nm}%'
+		</if>
+		<if test="bsn_state_nm != null">
+			AND BSN_STATE_NM LIKE '%${bsn_state_nm}%'
+		</if>
+		<if test="refine_roadnm_addr != null">
+			AND REFINE_ROADNM_ADDR LIKE '%${refine_roadnm_addr}%'
+		</if>
+		<if test="sido != null">
+			AND REFINE_ROADNM_ADDR LIKE '%${sido}%'
+		</if>
+		<if test="gugun != null">
+			AND REFINE_ROADNM_ADDR LIKE '%${gugun}%'
+		</if>
+		<if test="locplc_faclt_telno != null">
+			AND LOCPLC_FACLT_TELNO LIKE '%${locplc_faclt_telno}%'
+		</if>
+			LIMIT ${limit} OFFSET ${offset}
+	</select>
+	
+	<select id="selectAidkit_KCount" parameterType="map" resultType="int">
+		SELECT 
+			COUNT(*) 
+		FROM AIDKIT_K
+		WHERE 1 = 1
+		<if test="bizplc_nm != null">
+		AND BIZPLC_NM LIKE '%${bizplc_nm}%'
+		</if>
+		<if test="bsn_state_nm != null">
+			AND BSN_STATE_NM LIKE '%${bsn_state_nm}%'
+		</if>
+		<if test="refine_roadnm_addr != null">
+			AND REFINE_ROADNM_ADDR LIKE '%${refine_roadnm_addr}%'
+		</if>
+		<if test="sido != null">
+			AND REFINE_ROADNM_ADDR LIKE '%${sido}%'
+		</if>
+		<if test="gugun != null">
+			AND REFINE_ROADNM_ADDR LIKE '%${gugun}%'
+		</if>
+		<if test="locplc_faclt_telno != null">
+			AND LOCPLC_FACLT_TELNO LIKE '%${locplc_faclt_telno}%'
+		</if>
+	</select>
+	
+	
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

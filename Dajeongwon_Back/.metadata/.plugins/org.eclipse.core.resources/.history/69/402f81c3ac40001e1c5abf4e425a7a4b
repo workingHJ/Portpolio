@@ -1,0 +1,25 @@
+package com.dajeongwon.model.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.dajeongwon.mapper.MemberMapper;
+import com.dajeongwon.model.objectVo.MemberResponseDto;
+
+@Service
+public class MemberTokenService {
+
+	private final static BCryptPasswordEncoder pwEncoder = new BCryptPasswordEncoder();
+
+	@Autowired
+	private MemberMapper mapper;
+
+	public MemberResponseDto getMyInfoBySecurity() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	
+	
+}

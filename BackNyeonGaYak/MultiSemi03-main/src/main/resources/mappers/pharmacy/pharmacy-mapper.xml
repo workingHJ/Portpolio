@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.multi.semi03.pharmacy.model.mapper.PharmacyMapper">
+	<resultMap type="pharmacy" id="pharmacyresultMap">
+		<result property="dutyNo" column="dutyNo" />
+		<result property="dutyAddr" column="dutyAddr" />
+		<result property="dutyName" column="dutyName" />
+		<result property="dutyTel1" column="dutyTel1" />
+		<result property="dutyTime1c" column="dutyTime1c" />
+		<result property="dutyTime2c" column="dutyTime2c" />
+		<result property="dutyTime3c" column="dutyTime3c" />
+		<result property="dutyTime4c" column="dutyTime4c" />
+		<result property="dutyTime5c" column="dutyTime5c" />
+		<result property="dutyTime6c" column="dutyTime6c" />
+		<result property="dutyTime7c" column="dutyTime7c" />
+		<result property="dutyTime8c" column="dutyTime8c" />
+		<result property="dutyTime1s" column="dutyTime1s" />
+		<result property="dutyTime2s" column="dutyTime2s" />
+		<result property="dutyTime3s" column="dutyTime3s" />
+		<result property="dutyTime4s" column="dutyTime4s" />
+		<result property="dutyTime5s" column="dutyTime5s" />
+		<result property="dutyTime6s" column="dutyTime6s" />
+		<result property="dutyTime7s" column="dutyTime7s" />
+		<result property="dutyTime8s" column="dutyTime8s" />
+		<result property="wgs84Lon" column="wgs84Lon" />
+		<result property="wgs84Lat" column="wgs84Lat" />
+		<result property="pharmImg" column="pharmImg" />
+	</resultMap>
+	
+	<select id="selectPharmacyList" parameterType="map" resultMap="pharmacyresultMap">
+		SELECT * 
+		FROM PHARMACY
+		WHERE 1 = 1
+ 			<if test="sido != null">
+				AND dutyAddr LIKE '%${sido}%' 
+			</if>
+			<if test="gugun != null">
+				AND dutyAddr LIKE '%${gugun}%' 
+			</if>
+			<if test="address != null">
+				AND dutyAddr LIKE '%${address}%' 
+			</if> 
+		LIMIT ${limit} OFFSET ${offset}
+	</select>
+	
+	<select id="selectPharmacyCount" resultType="int" parameterType="map">
+		SELECT  
+			COUNT(*)
+		FROM PHARMACY
+		WHERE 1 = 1
+ 			<if test="sido != null">
+				AND dutyAddr LIKE '%${sido}%' 
+			</if>
+			<if test="gugun != null">
+				AND dutyAddr LIKE '%${gugun}%' 
+			</if>
+			<if test="address != null">
+				AND dutyAddr LIKE '%${address}%' 
+			</if> 
+	</select>
+	
+	<select id="selectFavorCount" resultType="int" parameterType="map">
+		SELECT  
+			COUNT(*) FROM PLIKES
+		WHERE 1 = 1
+		AND mNo = #{mno}
+		AND dutyNo = #{dutyNo}	
+	</select>
+	
+	<insert id="insertFavor" parameterType="map">
+		INSERT INTO PLIKES(mno, dutyNo) values(#{mno},#{dutyNo})
+	</insert>
+	
+	<delete id="deleteFavorPharmacy" parameterType="map">
+		DELETE FROM PLIKES
+		WHERE 1 = 1
+		AND mNo = #{mno}
+		AND dutyNo = #{dutyNo}	
+	</delete>
+	
+	<select id="selectFavorPharmacyList" resultType="FavorPharmacy" parameterType="int">
+		SELECT * FROM PLIKES
+		INNER JOIN MEMBER ON PLIKES.mno = Member.mno
+		INNER JOIN PHARMACY ON PLIKES.dutyNo = PHARMACY.dutyNo
+		WHERE Member.mno = #{mNo}
+	</select>
+	
+	<select id="selectPharmacyByDutyNo" parameterType="java.util.List" resultType="Pharmacy">
+	    SELECT * FROM PHARMACY WHERE dutyNo IN
+	    <foreach collection="list" item="dutyNo" open="(" close=")" separator=",">
+	        #{dutyNo}
+	    </foreach>
+	</select>
+		
+	
+	
+
+</mapper>

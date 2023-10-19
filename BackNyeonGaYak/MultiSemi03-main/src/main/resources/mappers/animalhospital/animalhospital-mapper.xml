@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.multi.semi03.animalHospital.model.mapper.AnimalhospitalMapper">
+	<resultMap type="Animalhospital" id="AnimalhospitalresultMap">
+		<result property="ahno" column="aHNo"/>
+		<result property="ahname" column="aHName"/>
+		<result property="ahstatus" column="aHStatus"/>
+		<result property="ahtel" column="aHTel"/>
+		<result property="ahaddress" column="aHAddress"/>
+		<result property="ahx" column="aHX"/>
+		<result property="ahy" column="aHY"/>
+		<result property="ahlmg" column="AHlmg"/>
+	</resultMap>
+	
+	<select id="selectAnimalhospitalList" parameterType="map" resultMap="AnimalhospitalresultMap">
+		SELECT *
+		FROM ANIMAL_HOSPITAL
+		WHERE 1 = 1
+			<if test="sido != null">
+				AND aHAddress LIKE '%${sido}%' 
+			</if>
+			<if test="gugun != null">
+				AND aHAddress LIKE '%${gugun}%' 
+			</if>
+			<if test="address != null">
+				AND aHAddress LIKE '%${address}%' 
+			</if> 
+		LIMIT ${limit} OFFSET ${offset}
+	</select>
+	
+	<select id="selectAnimalhospitalCount" resultType="int"  parameterType="map">
+	    SELECT  
+			COUNT(*)
+		FROM ANIMAL_HOSPITAL
+		WHERE 1 = 1
+		
+ 			<if test="sido != null">
+				AND aHAddress LIKE '%${sido}%' 
+			</if>
+			<if test="gugun != null">
+				AND aHAddress LIKE '%${gugun}%' 
+			</if>
+			<if test="address != null">
+				AND aHAddress LIKE '%${address}%' 
+			</if> 
+	</select>
+	
+</mapper>

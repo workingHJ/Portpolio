@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.multi.semi03.news.model.mapper.NewsMapper">
+	<resultMap type="News" id="newsResultMap">
+		<result property="nw_no" column="nw_NO"/>
+		<result property="nw_title" column="nw_Title"/>
+		<result property="nw_date" column="nw_Date"/>
+		<result property="nw_rply" column="nw_Rply"/>
+		<result property="nw_share" column="nw_Share"/>
+		<result property="nw_content" column="nw_Content"/>
+		<result property="nw_writer" column="nw_Writer"/>
+		<result property="nw_thumbnail" column="nw_ThumbNail"/>
+		<result property="nw_cate" column="nw_Cate"/>
+		<result property="nw_stata" column="nw_Stat"/>
+	</resultMap>
+	
+	<select id="selectNewsList" parameterType="map" resultMap="newsResultMap">
+		SELECT
+			nw_NO, nw_Title, nw_Date, nw_Rply, nw_Share, nw_Content, nw_Writer
+		FROM NEWS
+		WHERE 1 = 1 
+		<if test="nw_no != null">
+		AND nw_NO LIKE '%${nw_no}%'
+		</if>
+		<if test="nw_title != null">
+			AND nw_Title LIKE '%${nw_title}%'
+		</if>
+		<if test="nw_date != null">
+			AND nw_Date LIKE '%${nw_date}%'
+		</if>
+		<if test="nw_rply != null">
+			AND nw_Rply LIKE '%${nw_rply}%'
+		</if>
+		<if test="nw_share != null">
+			AND nw_Share LIKE '%${nw_share}%'
+		</if>
+		<if test="nw_content != null">
+			AND nw_Content LIKE '%${nw_content}%'
+		</if>
+		<if test="nw_writer != null">
+			AND nw_Writer LIKE '%${nw_writer}%'
+		</if>
+			LIMIT ${limit} OFFSET ${offset}
+				
+	</select>
+	
+	<select id="selectNewsCount" resultType="int" parameterType="map">
+		SELECT 
+			COUNT(*) 
+			FROM NEWS
+			WHERE 1 = 1 
+			<if test="nw_no != null">
+		AND nw_NO LIKE '%${nw_no}%'
+		</if>
+		<if test="nw_title != null">
+			AND nw_Title LIKE '%${nw_title}%'
+		</if>
+		<if test="nw_date != null">
+			AND nw_Date LIKE '%${nw_date}%'
+		</if>
+		<if test="nw_rply != null">
+			AND nw_Rply LIKE '%${nw_rply}%'
+		</if>
+		<if test="nw_share != null">
+			AND nw_Share LIKE '%${nw_share}%'
+		</if>
+		<if test="nw_content != null">
+			AND nw_Content LIKE '%${nw_content}%'
+		</if>
+		<if test="nw_writer != null">
+			AND nw_Writer LIKE '%${nw_writer}%'
+		</if>
+			
+	</select>
+	
+	
+</mapper>
+	

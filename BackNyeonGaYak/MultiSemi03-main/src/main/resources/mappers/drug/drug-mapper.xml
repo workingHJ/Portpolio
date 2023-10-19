@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.multi.semi03.drug.model.mapper.DrugMapper">
+	<resultMap type="Drug" id="drugResultMap">
+		<result property="itemNo" column="itemNo"/>
+		<result property="itemSeq" column="itemSeq" />
+		<result property="itemName" column="itemName" />
+		<result property="entpName" column="entpName" />
+		<result property="itemImage" column="itemImage" />
+		<result property="efcyQesitm" column="efcyQesitm" />
+		<result property="useMethodQesitm" column="useMethodQesitm" />
+		<result property="atpnWarnQesitm" column="atpnWarnQesitm" />
+		<result property="intrcQesitm" column="intrcQesitm" />
+		<result property="seQesitm" column="seQesitm" />
+		<result property="depositMethodQesitm" column="depositMethodQesitm" />
+		<result property="itemCoverImg" column="itemCoverImg" />
+		<result property="drugFront" column="DRUG_FRONT" />
+		<result property="drugShape" column="DRUG_SHAPE" />
+		<result property="drugColor" column="COLOR_CLASS1" />
+		<result property="formCode" column="FORM_CODE_NAME" />
+		<result property="itemLine" column="ITEM_LINE" />
+	</resultMap>
+	
+	
+	<!--  전체 삽입. 지우기 귀찮아서 남겨둠. -->
+	<insert id="insertDrugAll">
+	    INSERT INTO DRUG (
+	        itemNo, itemSeq, itemName, entpName, itemImage, efcyQesitm,
+	        useMethodQesitm, atpnWarnQesitm, atpnQesitm, intrcQesitm, seQesitm,
+	        depositMethodQesitm, itemCoverImg, DRUG_FRONT, DRUG_SHAPE, COLOR_CLASS1,
+	        FORM_CODE_NAME, ITEM_LINE
+	    )
+	    VALUES
+	    <foreach collection="list" item="item" separator=",">
+	        (default, #{item.itemSeq}, #{item.itemName}, #{item.entpName}, #{item.itemImage}, #{item.efcyQesitm},
+	        #{item.useMethodQesitm}, #{item.atpnWarnQesitm}, #{item.atpnQesitm}, #{item.intrcQesitm}, #{item.seQesitm}, 
+	        #{item.depositMethodQesitm}, default, #{item.drugFront}, #{item.drugShape}, #{item.drugColor}, 
+	        #{item.formCode}, #{item.itemLine})
+	    </foreach>
+	</insert>
+	
+	<!-- 목록 COUNT  -->
+ 	<select id="selectDrugCount" resultType="int" parameterType="map">
+		SELECT  
+			COUNT(*)
+		FROM DRUG
+		WHERE 1=1
+		<if test="itemName != null">
+			AND itemName LIKE '%${itemName}%' 
+		</if>		
+		<if test="efcyQesitm != null">
+			AND efcyQesitm LIKE '%${efcyQesitm}%'
+		</if>	
+		<if test="drugFront != null">
+			AND DRUG_FRONT LIKE '%${drugFront}%'
+		</if>		
+		<if test="drugShape != null">
+			AND DRUG_SHAPE LIKE '%${drugShape}%'
+		</if>		
+		<if test="drugColor != null">
+			AND COLOR_CLASS1 LIKE '%${drugColor}%'
+    	</if>
+		<if test="formCode != null">
+			AND FORM_CODE_NAME LIKE '%${formCode}%'
+    	</if>
+		<if test="itemLine != null">
+			AND ITEM_LINE LIKE '%${itemLine}%'
+    	</if>
+	</select>
+	
+	
+	<!--  목록 조회  -->
+	<select id="selectDrugList" resultType="Drug" parameterType="map">
+		SELECT *
+		FROM DRUG
+		WHERE 1=1
+		<if test="itemName != null">
+			AND itemName LIKE '%${itemName}%'
+		</if>
+		<if test="efcyQesitm != null">
+			AND efcyQesitm LIKE '%${efcyQesitm}%'
+		</if>
+		<if test="drugFront != null">
+			AND DRUG_FRONT LIKE '%${drugFront}%'
+		</if>		
+		<if test="drugShape != null">
+			AND DRUG_SHAPE LIKE '%${drugShape}%'
+		</if>		
+		<if test="drugColor != null">
+			AND COLOR_CLASS1 LIKE '%${drugColor}%'
+    	</if>
+		<if test="formCode != null">
+			AND FORM_CODE_NAME LIKE '%${formCode}%'
+    	</if>
+		<if test="itemLine != null">
+			AND ITEM_LINE LIKE '%${itemLine}%'
+    	</if>
+    	LIMIT ${limit} OFFSET ${offset}
+	</select>
+	
+	<select id="selectByItemNo" parameterType="int" resultMap="drugResultMap" >
+			SELECT itemNo, itemName, entpName, itemImage, efcyQesitm,
+				useMethodQesitm, atpnQesitm, intrcQesitm, seQesitm, depositMethodQesitm
+		FROM DRUG
+		WHERE 1=1
+		AND itemNo = #{itemNo}
+	</select>
+	
+	<!-- 즐겨찾기  -->
+	<select id="selectFavorCount" resultType="int" parameterType="map">
+		SELECT COUNT(*) FROM DLIKES
+		WHERE 1=1
+		AND mNo = #{mno}
+		AND itemNo = #{itemNo}
+	</select>
+	
+	
+	<insert id="insertFavor" parameterType="map">
+		INSERT INTO DLIKES(mno, itemNo) values(#{mno}, #{itemNo})
+	</insert>
+	
+	<delete id="deleteFavorDrug" parameterType="map">
+		DELETE FROM DLIKES 
+		WHERE 1=1
+		AND mNo = #{mno}
+		AND itemNo = #{itemNo}
+	</delete>
+	
+	<select id="selectFavorDrugList" parameterType="int" resultType="FavorDrug">
+		SELECT * FROM DLIKES
+		INNER JOIN Member ON DLIKES.mno = Member.mno
+		INNER JOIN Drug ON DLIKES.itemNo = Drug.itemNo
+		WHERE Member.mno = #{mno}
+	</select>
+	
+	<!-- 해당 itemNo들을 가진 Drug 레코드를 가져오는 쿼리 -->
+	<select id="selectDrugsByItemNos" parameterType="java.util.List" resultType="Drug">
+	    SELECT * FROM DRUG WHERE itemNo IN
+	    <foreach collection="list" item="itemNo" open="(" close=")" separator=",">
+	        #{itemNo}
+	    </foreach>
+	</select>
+	
+	
+</mapper>
+

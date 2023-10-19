@@ -1,0 +1,5 @@
+package com.dajeongwon.model.service;
+
+public class MemberTokenService {
+
+}
