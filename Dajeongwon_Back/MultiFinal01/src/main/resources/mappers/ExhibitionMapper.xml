@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dajeongwon.mapper.ExhibitionMapper">
+
+  <insert id="insertExhibition" parameterType="Exhibition">
+        INSERT INTO Exhibitions (
+            seq, title, startDate, endDate, place,
+            realmName, area, subTitle, price, contents1, 
+            contents2, url, phone, gpsX, gpsY,
+            imgUrl, placeUrl, placeAddr, placeSeq
+            
+        ) VALUES (
+            #{seq}, #{title}, #{startDate}, #{endDate}, #{place},
+            #{realmName}, #{area}, #{subTitle}, #{price}, #{contents1}, 
+            #{contents2}, #{url},#{phone},#{gpsX},#{gpsY},
+            #{imgUrl},#{placeUrl},#{placeAddr},#{placeSeq}
+                   )
+    </insert>
+
+    <!-- 	
+SELECT * from Exhibitions where area ='서울' AND placeAddr like '%강남%' and date(startDate) < '2023-02-01' and date(endDate) > '2023-02-28';
+    -->
+    
+    <select id="selectExhibitionList" resultType="Exhibition" parameterType="map">
+		SELECT <![CDATA[  
+			SEQ, TITLE, STARTDATE, ENDDATE, PLACE,
+            REALMNAME, AREA, SUBTITLE, PRICE, CONTENTS1, 
+            CONTENTS2, URL, PHONE, GPSX, GPSY,
+            IMGURL, PLACEURL, PLACEADDR, PLACESEQ ]]> 
+        from Exhibitions 
+         WHERE 1=1
+		<if test="title != null">
+			AND title like '%${title}%' 
+		</if>		
+		<if test="area != null">
+			AND area like '%${area}%' 
+		</if>		
+		<if test="placeAddr != null">
+			AND placeAddr LIKE '%${placeAddr}%' 
+		</if>		
+		<if test="selectedDateStr != null">
+		  AND date(startDate) <![CDATA[<=]]> '${selectedDateStr}' AND date(endDate) <![CDATA[>=]]> '${selectedDateStr}'
+		</if>
+		ORDER BY SEQ DESC LIMIT ${limit} OFFSET ${offset}
+	</select>
+	
+	<select id="selectExhibitionCount" resultType="int" parameterType="map">
+		SELECT  
+			 COUNT(DISTINCT SEQ)
+		 from Exhibitions
+         WHERE 1=1
+         <if test="title != null">
+			AND title like '%${title}%' 
+		</if>	
+		<if test="area != null">
+			AND area like '%${area}%' 
+		</if>		
+		<if test="placeAddr != null">
+			AND placeAddr LIKE '%${placeAddr}%' 
+		</if>		
+		<if test="startDate != null">
+			  AND date(startDate) <![CDATA[<=]]> '${selectedDateStr}' AND date(endDate) <![CDATA[>=]]> '${selectedDateStr}' 
+		</if>		
+	</select>
+	
+	  <select id="getExhibitionBySeq" resultType="Exhibition" parameterType="String">
+    	SELECT * FROM Exhibitions
+    	WHERE seq = #{seq}    	
+    </select>
+    
+      <select id="countExhibitionBySeq" resultType="int">
+        SELECT COUNT(*) FROM Exhibitions WHERE seq = #{seq}
+    </select>
+    
+    <select id="getExhibitionsByStartdate" parameterType="map" resultType="Exhibition">
+		SELECT  <![CDATA[  
+			SEQ, TITLE, STARTDATE, ENDDATE, PLACE,
+            REALMNAME, AREA, SUBTITLE, PRICE, CONTENTS1, 
+            CONTENTS2, URL, PHONE, GPSX, GPSY,
+            IMGURL, PLACEURL, PLACEADDR, PLACESEQ ]]>
+        from Exhibitions
+         WHERE 1=1
+		  AND date(startDate) <![CDATA[<=]]> #{startDate}
+		ORDER BY startDate desc LIMIT #{count}
+	</select>
+	
+	<select id="getExhiOfMonth" resultType="Exhibition" parameterType="map">
+		SELECT
+			SEQ, TITLE, STARTDATE, ENDDATE, PLACE, AREA,IMGURL
+		FROM exhibitions
+		ORDER BY STARTDATE DESC 
+		LIMIT #{count}
+	</select>
+    
+</mapper>

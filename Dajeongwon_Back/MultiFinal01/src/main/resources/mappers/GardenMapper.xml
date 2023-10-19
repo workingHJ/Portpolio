@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dajeongwon.mapper.GardenMapper">
+
+	<resultMap type="Garden" id="gardenResultMap">
+		<id property="gNo" column="G_NO" />
+		<result property="accessType" column="ACCESSTYPE" />
+		<result property="title" column="TITLE" />
+		<result property="description" column="GDESC" />
+		<result property="meetingDate" column="MEETINGDATE" />
+		<result property="regularTime" column="REGULARTIME" />
+		<result property="flower" column="FLOWER" />
+		<result property="flowerStatus" column="flowerStatus" />
+		<result property="headcount" column="HEADCOUNT" />
+		<result property="capacity" column="CAPACITY" />
+		<result property="imgPath" column="IMGPATH" />
+		<result property="categories" column="CATEGORIES" />
+		<result property="tags" column="TAGS" />
+		<result property="startDate" column="STARTDATE" />
+		<result property="endDate" column="ENDDATE" />
+		<result property="createDate" column="CREATEDATE" />
+		<result property="modifedDate" column="modifedDate" />
+		<result property="makerMNo" column="maker_mNo"/>
+	</resultMap>
+	
+	<resultMap type="GardenOwner" id="gardenOwnerResultMap">
+		<result property="gNo" column="g_no"/>
+		<result property="mNo" column="mNo"/>
+		<result property="isAdmin" column="is_Admin"/>
+	</resultMap>
+	
+	<sql id="selectGardenSql">
+		SELECT
+			g_no, accessType, title, gDesc, meetingDate, 
+			regularTime, flower, flowerStatus, headcount, capacity, 
+			imgPath, categories, tags, startDate, endDate, 
+			maker_mNo
+		FROM GARDEN
+	</sql>
+	
+	<!--  ================================================================================================ -->
+
+	<insert id="insertGarden" parameterType="Garden" useGeneratedKeys="true" keyProperty="gNo">
+	    INSERT INTO GARDEN(
+	        ACCESSTYPE, TITLE, GDESC, MEETINGDATE,
+	        REGULARTIME, FLOWER, CAPACITY, IMGPATH,
+	        CATEGORIES, TAGS, STARTDATE, ENDDATE, maker_mNo
+	    ) VALUES (
+	        #{accessType}, #{title}, #{description}, #{meetingDate}, 
+	        #{regularTime}, #{flower}, #{capacity}, #{imgPath},
+			<trim prefix="" suffix="" prefixOverrides=",">
+			    <foreach collection="categories" item="category" open="'" close="'" separator=",">${category}</foreach>
+			</trim>,
+			<trim prefix="" suffix="" prefixOverrides=",">
+			    <foreach collection="tags" item="tag" open="'" close="'" separator=",">${tag}</foreach>
+			</trim>,
+	        #{startDate}, #{endDate}, #{makerMNo})
+	</insert>
+	
+	
+	<insert id="insertGardenOwner" parameterType="GardenOwner">
+	  INSERT INTO GardenOwner (g_No, mNo, is_admin) VALUES (#{gNo}, #{mNo}, #{isAdmin})
+	</insert>
+	
+	<!--  Go Table : 멤버-Garden 관계 테이블. owner외에도 포함 -->
+	<select id="getGardenListByMNo" parameterType="int" resultType="Garden">
+		SELECT G.g_no, G.accessType, G.title, G.gDesc as description, G.meetingDate,
+			   G.regularTime, G.flower, G.headcount, G.capacity, G.imgPath, G.categories,
+			   G.tags, G.startDate, G.endDate, G.maker_mNo as makerMNo, Go.is_Admin as isAdmin,
+			   M.mImg as makerImg, M.nickName as makerNickName
+		FROM GARDEN G
+		INNER JOIN GardenOwner go ON g.g_no = go.g_No
+		INNER JOIN Member M ON g.maker_mNo = M.mNo
+		WHERE go.mNo = #{mNo}
+	</select>
+	
+	<select id="getPublicGardenList" resultType="Garden">
+	    SELECT G.g_no, G.accessType, G.title, G.gDesc AS description, G.meetingDate,
+	           G.regularTime, G.flower, G.headcount, G.capacity, G.imgPath, G.categories,
+	           G.tags, G.startDate, G.endDate, G.maker_mNo AS makerMNo,
+	           M.mImg AS makerImg, M.nickName AS makerNickName
+	    FROM GARDEN G
+	    INNER JOIN Member M ON G.maker_mNo = M.mNo
+	    <if test="aNo != null and aNo != ''"> 
+	        INNER JOIN ARTWORK AR ON AR.g_no = G.g_no
+	    </if>
+	    WHERE 
+	        1=1
+	        AND G.accessType = "public"
+	        <if test="title != null and title != ''"> 
+	            AND G.title LIKE '%${title}%'
+	        </if>
+	        <if test="category != null and category != ''"> 
+	            AND G.categories LIKE '%${category}%'
+	        </if>
+	        <if test="tag != null and tag != '' and tag != 'none'">		 
+	            AND G.tags LIKE '%${tag}%'
+	        </if>
+	        <if test="aNo != null and aNo != ''">
+	            AND AR.aNo = #{aNo}
+	        </if>
+	        ORDER BY 
+	        <if test="sort == null or sort == ''">
+	            G.startDate DESC
+	        </if>
+	        <if test="sort == 'newest'"> 
+	            G.startDate DESC 
+	        </if>
+	        <if test="sort == 'highHeadcount'"> 
+	            G.headcount DESC 
+	        </if>
+	        <if test="sort == 'lowHeadcount'"> 
+	            G.headcount ASC 
+	        </if>
+	    <if test="limit != null"> LIMIT #{limit}</if>
+	</select>
+
+	
+	<select id="getAdminGardenListByMNo" parameterType="int">
+		SELECT G.g_no, G.title
+		FROM GARDEN G
+		INNER JOIN GardenOwner go ON g.g_no = go.g_No
+		WHERE go.mNo = #{mNo} and go.is_Admin = "Y"
+	</select>
+	
+	<update id="updateMemberAuth" parameterType="map">
+	    UPDATE GardenOwner GO
+	    INNER JOIN Member m ON m.mNo = GO.mNo
+	    SET GO.is_Admin =
+	        <if test='isAdmin == "N"'> 'Y' </if>
+	        <if test='isAdmin == "Y"'> 'N' </if>
+	    WHERE GO.mNo = #{mNo} AND GO.g_no = #{gNo}
+	</update>
+	
+	<select id="getGardenByGNo" parameterType="int" resultType="Garden">
+		SELECT G.g_no, G.accessType, G.title, G.gDesc as description, G.meetingDate,
+			   G.regularTime, G.flower, G.flowerStatus, G.headcount, G.capacity,
+			   G.imgPath, G.categories, G.tags, G.startDate, G.endDate, 
+			   G.maker_mNo as makerMNo, M.mImg as makerImg, M.nickName as makerNickName
+		FROM GARDEN G
+		INNER JOIN GardenOwner go ON g.g_no = go.g_No
+		INNER JOIN Member M ON go.mNo = M.mNo
+		WHERE G.g_no = #{gNo}
+			  AND G.maker_mNo = M.mNo;
+	</select>
+	
+	<select id="getMembersByGNo" parameterType="int" resultType="com.dajeongwon.model.objectVo.MemberfromGNo">
+	    SELECT M.mNo, M.mImg, M.nickName, GO.is_Admin as gardenAdmin, M.status, M.snsType, M.snsID
+	    FROM Member M
+	    INNER JOIN GardenOwner go ON M.mNo = GO.mNo
+	    INNER JOIN GARDEN G ON G.g_No = GO.g_No
+	    WHERE 1 = 1 
+	        AND G.g_no = #{gNo}
+	        AND M.status = "ACTIVE"	
+	</select>
+	
+	<select id="getArtsByGNo" parameterType="int" resultType="Art">
+		SELECT A.aNo, A.title, A.creator, A.category, A.status, A.aImg, A.rating, A.reviewCount, A.isActive
+		FROM ARTWORK A
+		INNER JOIN GARDEN G on G.g_no = A.g_no
+		WHERE 1=1
+			AND G.g_no = #{gNo}
+			AND A.isActive = "Y"
+	</select>
+
+	<select id="getGardenByGNoMNo" parameterType="map" resultType="Garden">
+		SELECT G.g_no, G.accessType, G.title, G.gDesc as description, G.meetingDate,
+			   G.regularTime, G.flower, G.flowerStatus, G.headcount, G.capacity,
+			   G.imgPath, G.categories, G.tags, G.startDate, G.endDate, 
+			   G.maker_mNo as makerMNo, M.mImg as makerImg, M.nickName as makerNickName,
+			   Go.is_Admin as isAdmin
+		FROM GARDEN G
+		INNER JOIN GardenOwner go ON g.g_no = go.g_No
+		INNER JOIN Member M ON go.mNo = M.mNo
+		WHERE 1 = 1
+			AND Go.g_no = #{gNo}
+			AND Go.mNo = #{mNo}
+	</select>
+	
+	<select id="countGardenByGNoMNo" parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM GARDEN G
+		INNER JOIN GardenOwner go ON g.g_no = go.g_No
+		INNER JOIN Member M ON go.mNo = M.mNo
+		WHERE 1 = 1
+			AND Go.g_no = #{gNo}
+			AND Go.mNo = #{mNo}
+	</select>
+	
+	<select id="getHeadCountbyGNo" parameterType="int" resultType="int">
+		SELECT COUNT(*)
+		FROM GARDEN G
+		INNER JOIN GardenOwner go ON g.g_no = go.g_No
+		INNER JOIN Member M ON go.mNo = M.mNo
+		WHERE 1 = 1
+			AND Go.g_no = #{gNo}
+	</select>
+	
+	<select id="getCompletedArtCountByGNo" parameterType="int" resultType="int">
+		SELECT COUNT(*) 
+		FROM ARTWORK A
+		INNER JOIN GARDEN G on G.g_no = A.g_no
+		WHERE 1=1
+			AND G.g_no = #{gNo}
+			AND A.status = "COMPLETE"
+			AND A.isActive = "Y"
+	</select>
+	
+	<select id="getArtCountByGNo" parameterType="int" resultType="int">
+		SELECT COUNT(*) 
+		FROM ARTWORK A
+		JOIN GARDEN G on G.g_no = A.g_no
+		WHERE 1=1
+			AND G.g_no = #{gNo}
+			AND A.isActive = "Y"
+	</select>
+
+	<update id="updateTitleDescByGno" parameterType="map">
+		UPDATE GARDEN
+		SET title = #{title}, gDesc = #{description}, regularTime=#{regularTime}
+		WHERE g_no = #{gNo}
+	</update>
+
+	<update id="updateFlowerStatus">
+		UPDATE GARDEN
+		SET flowerStatus = #{flowerStatus}
+		WHERE g_no = #{gNo}
+	</update>
+
+	<update id="updateArtToInActive" parameterType="map">
+		UPDATE ARTWORK 
+		SET isActive = "N"
+		WHERE 1=1
+			AND g_no = #{gNo}
+			AND aNo = #{aNo}
+	</update>
+	
+	<delete id="deleteArt" parameterType="map">
+		DELETE FROM ARTWORK 
+		WHERE 1=1
+			AND g_no = #{gNo}
+			AND aNo = #{aNo}
+	</delete>
+	
+	<insert id="insertMembertoGarden" parameterType="map">
+		 INSERT INTO GardenOwner 
+		 		(mNo, g_no)
+		 VALUES 
+		 		(#{mNo}, #{gNo});
+	</insert>
+	
+	<delete id="removeMemberFromGarden" parameterType="map">
+	  DELETE FROM GardenOwner
+	  WHERE g_no = #{gNo} AND mNo = #{deportedMNo};
+	</delete>
+	
+	<insert id="insertKickOutReason" parameterType="map" >
+		INSERT INTO KickOutReason 
+				(g_no, deported_mNo, executed_mNo, executeddate, reason)
+        VALUES 
+        		(#{gNo}, #{deportedMNo}, #{executeMNo}, DEFAULT, #{kickOutReason})
+	</insert>
+	
+	<insert id="addMembers" parameterType="map">
+		INSERT INTO GardenOwner 
+			(mNo, g_no)
+		VALUES
+			<foreach collection="mNoList" item="mNo" separator=",">
+				(#{mNo}, #{gNo})
+			</foreach>
+	</insert>
+	
+	<select id="getIndexGarden" parameterType="map" resultType="Garden">
+		SELECT
+			TITLE, HEADCOUNT, CAPACITY, IMGPATH, G_NO, ACCESSTYPE,
+			CATEGORIES
+		FROM
+			GARDEN
+		WHERE
+			ACCESSTYPE = 'PUBLIC'
+		ORDER BY ENDDATE DESC
+		LIMIT #{count}
+	</select>
+</mapper>
+	

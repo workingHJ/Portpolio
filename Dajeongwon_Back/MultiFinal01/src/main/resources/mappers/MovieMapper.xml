@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dajeongwon.mapper.MovieMapper">
+
+<resultMap type="Movie" id="movieResultMap">
+  <id property="mvno" column="MVNO" />
+  <result property="movieId" column="MOVIEID" />
+  <result property="title" column="TITLE" />
+  <result property="titleEng" column="TITLEENG" />
+  <result property="releaseDate" column="RELEASEDATE" />
+  <result property="directorNm" column="DIRECTORNM" />
+  <result property="actorNm" column="ACTORNM" />
+  <result property="company" column="COMPANY" />
+  <result property="prodYear" column="PRODYEAR" />
+  <result property="plotText" column="PLOTTEXT" />
+  <result property="posters" column="POSTERS" />
+  <result property="genre" column="GENRE" />
+  <result property="nation" column="NATION" />
+  <result property="awards1" column="Awards1" />
+  <result property="awards2" column="Awards2" />
+  <result property="rating" column="RATING" />
+</resultMap>
+
+	<insert id="insertMovie" parameterType="Movie">
+  INSERT INTO Movies (
+    MVNO, MOVIEID, TITLE, TITLEENG, RELEASEDATE, DIRECTORNM,
+    ACTORNM, COMPANY, PRODYEAR, PLOTTEXT, POSTERS,
+    GENRE, NATION, Awards1, Awards2, RATING
+  ) VALUES (
+    #{mvno}, #{movieId}, #{title}, #{titleEng}, #{releaseDate}, #{directorNm},
+    #{actorNm}, #{company}, #{prodYear}, #{plotText}, #{posters},
+    #{genre}, #{nation}, #{awards1}, #{awards2}, #{rating}
+  )
+</insert>
+	
+	<!-- SELECT * from Exhibitions where area ='서울' AND placeAddr like '%강남%' 
+		and date(startDate) < '2023-02-01' and date(endDate) > '2023-02-28'; -->
+
+	<select id="selectMovieList" resultType="Movie"
+		parameterType="map">
+		SELECT
+		MVNO, MOVIEID, TITLE, TITLEENG, RELEASEDATE,
+		DIRECTORNM, ACTORNM,
+		COMPANY, PRODYEAR, PLOTTEXT,
+		POSTERS, GENRE, NATION
+		FROM Movies
+		WHERE 1=1
+		<if test="title != null">
+			AND TITLE like '%${title}%'
+		</if>
+		<if test="directorNm != null">
+			AND DIRECTORNM like '%${directorNm}%'
+		</if>
+		<if test="actorNm != null">
+			AND ACTORNM like '%${actorNm}%'
+		</if>
+		<if test="genre != null">
+			AND GENRE like '%${genre}%'
+		</if>
+		ORDER BY MVNO DESC LIMIT ${limit} OFFSET ${offset}
+	</select>
+
+	<select id="selectMovieCount" resultType="int"
+		parameterType="map">
+		SELECT
+		COUNT(DISTINCT MVNO)
+		FROM movies
+		WHERE 1=1
+		<if test="title != null">
+			AND TITLE like '%${title}%'
+		</if>
+		<if test="directorNm != null">
+			AND DIRECTORNM like '%${directorNm}%'
+		</if>
+		<if test="actorNm != null">
+			AND ACTORNM like '%${actorNm}%'
+		</if>
+		<if test="genre != null">
+			AND GENRE like '%${genre}%'
+		</if>
+	</select>
+	
+	
+	  <select id="selectAllMovies" resultType="com.dajeongwon.model.vo.Movie">
+        SELECT
+            MVNO, MOVIEID, TITLE, TITLEENG, RELEASEDATE,
+            DIRECTORNM, ACTORNM, COMPANY, PRODYEAR,
+            PLOTTEXT, POSTERS, GENRE, NATION
+        FROM
+            Movies
+    </select>
+    
+	<select id="searchMovies" resultMap="movieResultMap">
+   		SELECT *
+    	FROM movies
+    	WHERE 
+    	<!--  searchType = title / directorNm / actorNm // searchTerm -> 검색어 -->
+    		<if test="searchType == 'Title'">
+    			TITLE like '%${searchTerm}%'
+    		</if>
+    		<if test="searchType == 'directorNm'">
+    			DIRECTORNM like '%${searchTerm}%'
+    		</if>
+    		<if test="searchType == 'actorNm'">
+    			ACTORNM like '%${searchTerm}%'
+    		</if>
+	</select>
+
+
+	<select id="getMoviesByGenre"  resultType="Movie" parameterType="String">
+		SELECT * 
+		FROM movies 
+		WHERE genre like '%${genre}%'
+		order by awards1, POSTERS DESC limit 30
+	</select>
+	
+	<select id="getMoviesByGenre2"  resultType="Movie" parameterType="String">
+		SELECT * 
+		FROM movies 
+		WHERE genre like '%${genre}%'
+		order by prodYear DESC limit 5
+	</select>
+
+
+<select id="countMovieByMvno" resultType="int">
+        SELECT COUNT(*) FROM Movies WHERE mvno = #{mvno}
+    </select>
+
+
+<select id="getMovieByMvno" resultType="Movie" parameterType="int">
+    	SELECT * FROM Movies
+    	WHERE mvno = #{mvno}    	
+    </select>
+
+
+<select id="getMoviesByDirector" resultType="Movie" parameterType="String">
+       SELECT * 
+		FROM movies 
+		WHERE directorNm like '%${directorNm}%' 
+		LIMIT 5 
+    </select>
+    
+      <select id="selectCountByMvno" parameterType="int" resultType="int">
+        SELECT COUNT(*) FROM movies WHERE mvno = #{mvno}
+    </select>
+    
+    
+     <select id="existsByMvno" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM movies WHERE mvno = #{mvno})
+    </select>
+ 
+     <select id="selectMovieByMvno" resultType="com.dajeongwon.model.vo.Movie">
+        SELECT * FROM movies WHERE mvno = #{mvno}
+    </select>
+    
+</mapper>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dajeongwon.mapper.ArtMapper">
+	
+	<!--  작품 정원에 art로 추가 -->
+	
+	<insert id="insertToGarden" parameterType="Art">
+	    INSERT INTO artWork 
+	        (title, creator, category, aImg, g_no, 
+	        <if test="mvNo != 0">MVNO</if>
+	        <if test="seq != 0">seq</if>
+	        <if test="mt20id != null and mt20id !=''">mt20id</if> 
+	        <if test="bNo != 0">bNo</if>)
+	    VALUES 
+	        (#{title}, #{creator}, #{category}, #{aImg}, #{gNo}, 
+	        <if test="mvNo != 0">#{mvNo}</if>
+	        <if test="seq != 0">#{seq}</if>
+	        <if test="mt20id != null and mt20id !=''">#{mt20id}</if>
+	        <if test="bNo != 0">#{bNo}</if>)
+	</insert>
+	
+	<!--  중복 체크용 count -->
+	
+	<select id="countByGNo" resultType="int">
+		SELECT COUNT(*) FROM artWork
+	</select>
+	
+   	<select id="countByGNoAndMovieNo" resultType="int">
+        SELECT COUNT(*) FROM artWork
+        WHERE g_no = #{gNo} AND MVNO = #{mvNo}
+    </select>
+    
+    <select id="countByGNoAndSeq" resultType="int">
+        SELECT COUNT(*) FROM artWork
+        WHERE g_no = #{gNo} AND seq = #{seq}
+    </select>
+    
+    <select id="countByGNoAndmt20id" resultType="int">
+        SELECT COUNT(*) FROM artWork
+        WHERE g_no = #{gNo} AND mt20id = #{mt20id}
+    </select>
+
+	<select id="countByGNoAndBNo" resultType="int">
+        SELECT COUNT(*) FROM artWork
+        WHERE 1=1 
+        	AND g_no = #{gNo} 
+        	AND bNo = #{bNo}
+        	AND isActive = 'Y'
+    </select>
+    
+    <!--  여기서부터 본격적인 garden안의 art -->
+    
+    <select id="getArtByGnoAno" parameterType="map" resultType="Art">
+		SELECT A.aNo, A.title, A.creator, A.category, A.status, A.aImg, A.rating, A.reviewCount, A.isActive
+		FROM ARTWORK A
+		INNER JOIN GARDEN G on G.g_no = A.g_no
+		WHERE 1=1
+			AND G.g_no = #{gNo}
+			AND A.aNo = #{aNo}
+    </select>
+    
+	<update id="setArtStatus" parameterType="map">
+	    UPDATE ARTWORK
+	    SET status =
+	    <choose>
+	        <when test="status == 'INCOMPLETE'"> 'COMPLETE' </when>
+	        <when test="status == 'COMPLETE'"> 'INCOMPLETE' </when>
+	        <otherwise> status </otherwise>
+	    </choose>
+	    WHERE aNo = #{aNo}
+	</update>
+	
+	<!--  아래부터 리뷰 관련 -->
+    <select id="getArtReviewCountByGnoAno" parameterType="map" resultType="int">
+    	SELECT COUNT(*)
+    	FROM ARTWORK_REVIEW 
+    	WHERE 1=1
+    		AND aNo = #{aNo}
+    		AND g_no = #{gNo}
+			AND STATUS = 'Y'
+    </select>
+    
+    <select id="getArtReviewRatingByGnoAno" parameterType="map" resultType="float">
+    	SELECT AVG(RATE)
+    	FROM ARTWORK_REVIEW 
+    	WHERE 1=1
+    		AND aNo = #{aNo}
+    		AND g_no = #{gNo} 
+			AND STATUS = 'Y'
+    </select>
+	
+    <select id="getArtReviewsByGnoAno" parameterType="map" resultType="ArtReview">
+    	SELECT AR.rNo, AR.title, AR.content, AR.createDate, AR.modifiedDate, 
+    			AR.rate, AR.mNo, AR.aNo, AR.g_no as gNo,
+    			M.mImg as writerImg, M.snsType as writerSNStype, M.nickName as writerNickName
+    	FROM ARTWORK_REVIEW AR
+    	INNER JOIN MEMBER M on M.mNo = AR.mNo
+    	WHERE 1=1
+    		AND aNo = #{aNo}
+    		AND g_no = #{gNo}
+    		AND AR.STATUS = 'Y'
+    </select>
+    
+    <select id="getArtReviewByGnoAnoRno" parameterType="map" resultType="ArtReview">
+    	SELECT AR.rNo, AR.title, AR.content, AR.createDate, AR.modifiedDate, 
+    			AR.rate, AR.mNo, AR.aNo, AR.g_no as gNo,
+    			M.mImg as writerImg, M.snsType as writerSNStype, M.nickName as writerNickName
+    	FROM ARTWORK_REVIEW AR
+    	INNER JOIN MEMBER M on M.mNo = AR.mNo
+    	WHERE 1=1
+    		AND rNo = #{rNo}
+    		AND aNo = #{aNo}
+    		AND g_no = #{gNo}
+    		AND AR.STATUS = 'Y'
+    </select>
+    
+    <select id="checkReviewExist"  parameterType="map" resultType="int">
+    	SELECT COUNT(*)
+    	FROM ARTWORK_REVIEW 
+    	WHERE 1=1 
+    		AND rNo = #{rNo}
+    		AND STATUS = 'Y'
+     </select>
+
+	<update id="updateReview" parameterType="map">
+		UPDATE ARTWORK_REVIEW
+		SET TITLE = #{title},
+			CONTENT = #{content},
+			RATE = #{rating},
+			modifiedDate = #{modifiedDate}
+		WHERE rNo = #{rNo}
+	</update>
+
+	<insert id="insertReview" parameterType="map">
+		INSERT INTO ARTWORK_REVIEW
+		(title, content, createDate, modifiedDate, rate,
+		mNo, aNo, g_no)
+		VALUES
+		(#{title}, #{content}, DEFAULT, DEFAULT, #{rating},
+		#{mNo}, #{aNo}, #{gNo})
+	</insert>
+
+	<update id="deleteReviewByRno" parameterType="map">
+		UPDATE ARTWORK_REVIEW
+		SET STATUS = 'N',
+			modifiedDate = #{modifiedDate}
+		WHERE rNo = #{rNo}
+	</update>
+	
+	
+</mapper>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dajeongwon.mapper.MemberMapper">
+
+
+	<sql id="selectMemberSql">
+		SELECT
+		MNO, EMAIL, PASSWORD, NICKNAME, MIMG,
+		ENROLLDATE,
+		MODIFIEDdATE, ROLE, STATUS,
+		SNSTYPE, SNSID
+		FROM MEMBER
+	</sql>
+
+	<resultMap type="Member" id="memberResultMap">
+		<id property="mNo" column="MNO" />
+		<result property="email" column="EMAIL" />
+		<result property="password" column="PASSWORD" />
+		<result property="nickName" column="nickName" />
+		<result property="mImg" column="MIMG" />
+		<result property="enrollDate" column="ENROLLDATE" />
+		<result property="modifyDate" column="MODIFYDATE" />
+		<result property="role" column="ROLE" />
+		<result property="status" column="STATUS" />
+		<result property="snsType" column="SNSTYPE" />
+	</resultMap>
+	
+	<resultMap type="ArtReview" id="reviewJoinMeberAndGardenAndArt">
+		<id property="rNo" column="RNO"/>
+		<result property="title" column="RTITLE"/>
+		<result property="content" column="CONTENT"/>
+		<result property="createDate" column="CREATEDATE"/>
+		<result property="modifiedDate" column="MODIFIEDDATE"/>
+		<result property="aNo" column="ANO"/>
+		<result property="gNo" column="G_NO"/>
+		<result property="mNo" column="MNO"/>
+		<result property="aTitle" column="ATITLE"/>
+		<result property="aImg" column="AIMG"/>
+		<result property="gTitle" column="GTITLE"/>
+	</resultMap>
+
+	<select id="selectCount" resultType="int">
+		SELECT COUNT(*) FROM MEMBER
+	</select>
+
+	<select id="selectAll" resultMap="memberResultMap">
+		<include refid="selectMemberSql" />
+	</select>
+
+	<select id="selectMember" parameterType="string"
+		resultMap="memberResultMap">
+		<include refid="selectMemberSql" />
+		WHERE EMAIL = #{ID} AND STATUS = 'ACTIVE'
+	</select>
+
+	<select id="selectMemberByMNo" parameterType="int" resultMap="memberResultMap">
+		<include refid="selectMemberSql" />
+		WHERE MNO = #{mNo}
+	</select>
+
+	<select id="findSNSMebmer" parameterType="string"
+		resultMap="memberResultMap">
+		<include refid="selectMemberSql" />
+		WHERE SNSID = #{ID} AND SNSTYPE = #{TYPE} AND STATUS = 'ACTIVE'
+	</select>
+
+
+	<!-- <insert id="insertMember" parameterType="Member"> INSERT INTO MEMBER( 
+		MNO, EMAIL, PASSWORD, NICKNAME, ORIGINAL_FILENAME,RENAMED_FILENAME, ENROLLDATE, 
+		MODIFIEDDATE, ISADMIN, STATUS, SNSTYPE, SNSID ) VALUES ( 0, #{email}, #{password}, 
+		#{nickName}, #{originalFileName}, #{renamedFileName}, DEFAULT, DEFAULT, DEFAULT, 
+		'ACTIVE', DEFAULT, DEFAULT) </insert> <insert id="insertSNSMember" parameterType="Member"> 
+		INSERT INTO MEMBER( MNO, EMAIL, PASSWORD, NICKNAME, ORIGINAL_FILENAME,RENAMED_FILENAME, 
+		ENROLLDATE, MODIFIEDDATE, ISADMIN, STATUS, SNSTYPE, SNSID ) VALUES ( 0, #{email}, 
+		#{password}, #{nickName}, #{originalFileName}, #{renamedFileName}, DEFAULT, 
+		DEFAULT, DEFAULT, 'ACTIVE', #{snsType}, #{snsID}) </insert> -->
+		
+		
+		
+	<insert id="insertMember" parameterType="Member">
+		INSERT INTO MEMBER(
+		MNO, EMAIL, PASSWORD, NICKNAME, MIMG,
+		ENROLLDATE, MODIFIEDdATE, ROLE, STATUS,
+		SNSTYPE, SNSID
+		) VALUES (
+		0, #{email}, #{password}, #{nickName}, #{mImg},
+		DEFAULT, DEFAULT, DEFAULT, DEFAULT,
+		DEFAULT, DEFAULT)
+	</insert>
+
+	<insert id="insertSNSMember" parameterType="Member">
+		INSERT INTO MEMBER(
+		MNO, EMAIL, PASSWORD, NICKNAME, MIMG,
+		ENROLLDATE, MODIFIEDdATE, ROLE, STATUS,
+		SNSTYPE, SNSID
+		) VALUES (
+		0, #{email}, #{password}, #{nickName}, #{mImg},
+		DEFAULT, DEFAULT, DEFAULT, DEFAULT,
+		#{snsType}, #{snsID})
+	</insert>
+
+	<update id="updateMember" parameterType="Member">
+		UPDATE MEMBER
+		SET
+		EMAIL = #{email},
+		NICKNAME = #{nickName},
+		MODIFIEDDATE = DEFAULT
+		WHERE MNO = #{mNo}
+	</update>
+
+	<update id="updatePwd" parameterType="map">
+		UPDATE MEMBER
+		SET PASSWORD =
+		#{password}
+		WHERE MNO = #{mNo}
+	</update>
+
+	<update id="deleteMember" parameterType="int">
+		UPDATE MEMBER
+		SET STATUS
+		= 'N'
+		WHERE MNO = #{mNo}
+	</update>
+
+	<update id="updateMImg">
+		UPDATE MEMBER
+		SET MIMG = #{mImg}
+		WHERE MNO = #{mNo}
+	</update>
+
+	<!-- ============================= 내가 쓴 글 목록 ============================= -->
+	<select id="selectMyReview"  parameterType="map" resultMap="reviewJoinMeberAndGardenAndArt">
+		select
+			R.rNo, R.title as "rTitle", R.createDate, R.modifiedDate, R.content,
+			A.title as "aTitle", A.aImg, A.aNo,
+			G.title as "gTitle", G.g_no, G.accessType,
+			M.mNo
+		from artwork_review R
+			left join artwork A on R.aNo = A.aNo
+			left join member M on R.mNo = M.mNo
+			left join garden G on R.g_no = G.g_no
+		where 1=1 
+			AND R.mNo = #{mNo}
+			AND R.STATUS = 'Y'
+	</select>
+
+</mapper>

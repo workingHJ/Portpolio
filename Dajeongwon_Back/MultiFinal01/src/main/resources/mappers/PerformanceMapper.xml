@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dajeongwon.mapper.PerformanceMapper">
+
+	<insert id="insertPerformance" parameterType="Perform">
+		INSERT INTO Performance (
+		mt20id, mt10id, prfnm, prfpdfrom, prfpdto, fcltynm,
+		poster, genrenm, prfstate, openrun, prfcast,
+		prfcrew, prfage, pcseguidance, prfruntime, awards, adres, la, lo
+
+		) VALUES (
+		#{mt20id}, #{mt10id}, #{prfnm}, #{prfpdfrom}, #{prfpdto}, #{fcltynm},
+		#{poster}, #{genrenm}, #{prfstate}, #{openrun}, #{prfcast},
+		#{prfcrew}, #{prfage},#{pcseguidance},#{prfruntime}, #{awards},
+		#{adres}, #{la}, #{lo}
+		)
+	</insert>
+
+
+	<!-- 	
+SELECT * from Performances where area ='서울' AND placeAddr like '%강남%' and
+	date(startDate) < '2023-02-01' and date(endDate) > '2023-02-28';
+    -->
+
+	<select id="selectPerformanceList" resultType="Perform"
+		parameterType="map">
+		SELECT mt20id, mt10id, prfnm, prfpdfrom, prfpdto, fcltynm, poster,
+		genrenm, prfstate, openrun, prfcast, prfcrew, prfage, pcseguidance,
+		prfruntime, awards from Performance WHERE 1=1
+		<if test="prfnm != null">
+			AND prfnm like '%${prfnm}%'
+		</if>
+		<if test="genrenm != null">
+			AND genrenm like '%${genrenm}%'
+		</if>
+
+		<if test="area != null">
+			AND SUBSTRING_INDEX(SUBSTRING_INDEX(adres, ' ', 1), '시',
+			1) like
+			'%${area}%'
+		</if>
+		<if test="subarea != null">
+			AND SUBSTRING_INDEX(SUBSTRING_INDEX(SUBSTRING_INDEX(adres,
+			' ', 2),
+			' ', -1), '구', 1) like '%${subarea}%'
+		</if>
+		<if test="selectedDateStr != null">
+			AND date(prfpdfrom) <![CDATA[<=]]>
+			'${selectedDateStr}' AND date(prfpdto) <![CDATA[>=]]>
+			'${selectedDateStr}'
+		</if>
+		ORDER BY mt20id DESC LIMIT ${limit} OFFSET
+		${offset}
+	</select>
+
+	<select id="selectPerformanceCount" resultType="int" parameterType="map">
+		SELECT COUNT(mt20id) from Performance WHERE 1=1 <if test="prfnm != null">
+		AND prfnm like '%${prfnm}%'
+		</if>		
+		<if test="genrenm != null">
+			AND genrenm like '%${genrenm}%'
+		</if>	
+	
+ <if test="area != null">
+			AND SUBSTRING_INDEX(SUBSTRING_INDEX(adres, ' ', 1), '시', 1) like
+		'%${area}%'
+		</if>
+    <if
+			test="subarea != null">
+			AND SUBSTRING_INDEX(SUBSTRING_INDEX(SUBSTRING_INDEX(adres, ' ', 2),
+		' ', -1), '구', 1) like '%${subarea}%'
+		</if>	
+		 
+		<if
+			test="selectedDateStr != null">
+			AND date(prfpdfrom) <![CDATA[<=]]> '${selectedDateStr}' AND date(prfpdto) <![CDATA[>=]]>
+		'${selectedDateStr}'
+		</if>
+	</select>
+
+	<select id="getPerformanceByPrfNo" resultType="Perform"
+		parameterType="String">
+		SELECT * FROM Performance
+		WHERE mt20id = #{mt20id}
+	</select>
+
+	<select id="countPerformanceByPrfNo" resultType="int">
+		SELECT COUNT(*) FROM Performance WHERE mt20id = #{mt20id}
+	</select>
+
+	<select id="getPerformanceByAwards" parameterType="map" resultType="Perform">
+		SELECT
+		mt20id, mt10id, prfnm, prfpdfrom, prfpdto, fcltynm,
+		poster, genrenm, prfstate, openrun, prfcast,
+		prfcrew, prfage, pcseguidance, prfruntime, awards
+		from Performance
+		WHERE awards != '-'
+		ORDER BY mt20id desc LIMIT #{page}
+	</select>
+	<select id="getPlaceByMT10" parameterType="map" resultType="Perform">
+		SELECT P.mt20id, P.mt10id, P.prfnm, P.prfpdfrom, P.prfpdto, P.fcltynm,
+		P.poster, P.genrenm, P.prfstate, P.openrun, P.prfcast,
+		P.prfcrew, P.prfage, P.pcseguidance, P.prfruntime, P.awards
+		FROM Performance P
+		INNER JOIN PerformancePlace PL on PL.mt10id = P.mt10id
+		WHERE 1=1
+		AND PL.mt10id = #{mt10id}
+	</select>
+
+
+</mapper>

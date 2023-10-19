@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dajeongwon.mapper.BookMapper">
+
+    <select id="countBookByIsbn" resultType="int">
+        SELECT COUNT(*) FROM Books WHERE isbn13 = #{isbn13}
+    </select>
+
+    <insert id="insertBook" parameterType="Book">
+        INSERT INTO Books (
+            title, author, link, cover, publisher,
+            priceStandard, priceSales, pubDate,
+            isbn13, categoryName, description,
+            customerReviewRank, bestDuration, bestRank, selectCount
+        ) VALUES (
+            #{title}, #{author}, #{link}, #{cover}, #{publisher},
+            #{priceStandard}, #{priceSales}, #{pubDate},
+            #{isbn13}, #{categoryName}, #{description},
+            #{customerReviewRank}, #{bestDuration}, #{bestRank}, #{selectCount}
+        )
+    </insert>
+    
+    <select id="getBookByIsbn" resultType="Book" parameterType="String">
+    	SELECT * FROM BOOKS
+    	WHERE isbn13 = #{isbn13}    	
+    </select>
+    
+    <select id="getBNoByIsbn13" resultType="int" parameterType="String">
+    	SELECT bNo FROM BOOKS
+    	WHERE isbn13 = #{isbn13};
+    </select>
+    
+    
+    
+</mapper>
